@@ -2,7 +2,7 @@ import * as React from "react";
 import { useEffect } from "react";
 import { ReactSketchCanvas } from "react-sketch-canvas";
 
-import { Undo as UndoIcon, Trash as TrashIcon } from "lucide-react";
+import { Undo as UndoIcon, Trash as TrashIcon, Redo as RedoIcon, Eraser as EraserIcon, Pencil as PenIcon } from "lucide-react";
 
 export default function Canvas({
   startingPaths,
@@ -19,11 +19,15 @@ export default function Canvas({
       .querySelector("#react-sketch-canvas__stroke-group-0")
       ?.removeAttribute("mask");
 
-    loadStartingPaths();
+    canvasRef.current.eraseMode(true)
+    canvasRef.current.eraseMode(false)
+    // loadStartingPaths();
   }, []);
 
   async function loadStartingPaths() {
     await canvasRef.current.loadPaths(startingPaths);
+
+
     setScribbleExists(true);
     onChange();
   }
@@ -44,10 +48,21 @@ export default function Canvas({
     canvasRef.current.undo();
   };
 
+  const redo = () => {
+    canvasRef.current.redo();
+  };
+
   const reset = () => {
     setScribbleExists(false);
     canvasRef.current.resetCanvas();
   };
+  const eraser =()=>{
+    canvasRef.current.eraseMode(true)
+  }
+
+  const pencil =()=>{
+    canvasRef.current.eraseMode(false)
+  }
 
   return (
     <div className="relative">
@@ -70,6 +85,14 @@ export default function Canvas({
 
       {scribbleExists && (
         <div className="animate-in fade-in duration-700 text-left">
+          <button className="lil-button" onClick={pencil}>
+            <PenIcon className="icon" />
+            Pencil
+          </button>
+          <button className="lil-button" onClick={eraser}>
+            <EraserIcon className="icon" />
+            Eraser
+          </button>
           <button className="lil-button" onClick={undo}>
             <UndoIcon className="icon" />
             Undo
@@ -77,6 +100,10 @@ export default function Canvas({
           <button className="lil-button" onClick={reset}>
             <TrashIcon className="icon" />
             Clear
+          </button>
+          <button className="lil-button" onClick={redo}>
+            <RedoIcon className="icon" />
+            Redo
           </button>
         </div>
       )}
